@@ -15,7 +15,7 @@ def paint(t: float):
             pixels[i, j] = 0
 
 
-gui = ti.GUI("Julia Set", res=(n, n))
+gui = ti.GUI("Point", res=(n, n))
 
 for i in range(1000000000):
     paint(i * 0.03)

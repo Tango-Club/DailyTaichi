@@ -4,7 +4,7 @@ import math
 ti.init(arch=ti.gpu)
 
 eps = 0.00001
-n = 200
+n = 1000
 
 pixels = ti.field(dtype=float, shape=(n, n))
 
@@ -40,7 +40,7 @@ def paint(t: float):
         pixels[i, j] = check(i, j, p)
 
 
-gui = ti.GUI("Julia Set", res=(n, n))
+gui = ti.GUI("Star", res=(n, n))
 
 for i in range(1000000000):
     paint(i * 0.03)
