@@ -8,39 +8,12 @@ n = 200
 
 pixels = ti.field(dtype=float, shape=(n, n))
 
-'''
-def check(x: float, y: float, p: float) -> float:
-
-    q = 180*p
-
-    x -= n/2
-    y -= n/2
-    x = -abs(x)
-    if x == 0:
-        x -= eps
-
-    print(type(ti.floor(x)))
-    zeta = ti.atan2(y,x)
-
-    while zeta > (90+q)*math.pi/180:
-        zeta -= q*math.pi/90
-    while zeta < (90-q)*math.pi/180:
-        zeta += q*math.pi/90
-    zeta = abs(math.pi/2-zeta)
-
-    if 2*ti.sqrt(x*x+y*y)/n <= ti.sin(math.pi*q/360)/ti.sin(math.pi*q/360+zeta):
-        return 0
-    return 1
-'''
-
-
 @ti.func
 def check(x, y, p):
     q = 180*p
 
     x -= n/2
     y -= n/2
-    #x = -abs(x)
 
     zeta = 2*ti.atan2(ti.cast(y, ti.f32), ti.cast(x, ti.f32))
     
