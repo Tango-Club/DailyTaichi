@@ -11,7 +11,7 @@ pixels = ti.field(dtype=float, shape=(n, n))
 def paint(t: float):
     p = abs(0.5 - (t - int(t)))
     for i, j in pixels:  # Parallelized over all pixels
-        if (abs(i - n / 2) ** 2)+(abs(j - n / 2) ** 2) < (0.5 - p) * 10 * n:
+        if (abs(i - n / 2)**2) + (abs(j - n / 2)**2) < (0.5 - p) * 10 * n:
             pixels[i, j] = 1
         else:
             pixels[i, j] = 0
