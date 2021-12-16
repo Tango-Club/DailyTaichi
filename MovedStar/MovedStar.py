@@ -1,5 +1,7 @@
 from MovedStar.Entitys import BaseEntity, Player
-from MovedStar.Utils2D import Point2D, Vector2D
+from shapely.geometry import Point as Vector
+from shapely.geometry import Polygon
+
 import taichi as ti
 import math
 
@@ -8,11 +10,18 @@ def main():
     ti.init(arch=ti.gpu)
 
     eps = 0.00001
-    board_size = 1000
 
+    board_size = 800
     self_size = 100
+    edge_size = 10
 
     player = Player(self_size, board_size / 2, board_size / 2)
+
+    BaseEntity.edge = Polygon([(edge_size, edge_size),
+                               (edge_size, board_size - edge_size),
+                               (board_size - edge_size,
+                                board_size - edge_size),
+                               (board_size - edge_size, edge_size)])
 
     pixels = ti.field(dtype=float, shape=(board_size, board_size))
 
@@ -44,30 +53,45 @@ def main():
                        or abs(y) > self_size) else check_inner(x, y, p)
 
     @ti.kernel
-    def paint(c_x: float, c_y: float, t: float):
+    def paint_player(c_x: float, c_y: float, t: float):
         speed = 0.05
         p = 2 * abs(0.5 - (t * speed - int(t * speed)))
         p = max(p, eps)
         p = min(p, 0.5)
+
         for i, j in pixels:  # Parallelized over all pixels
             pixels[i, j] = check(c_x, c_y, i, j, p)
+
+    @ti.kernel
+    def paint_edges():
+        for i, j in pixels:
+            if min(i, board_size - i) < edge_size or min(
+                    j, board_size - j) < edge_size:
+                pixels[i, j] = 0
 
     def update_self(player):
         gui.get_event()
 
         if gui.is_pressed(ti.GUI.LEFT):
-            player.update_speed(Vector2D(-1, 0))
+            player.update_speed(Vector(-1, 0))
         if gui.is_pressed(ti.GUI.RIGHT):
-            player.update_speed(Vector2D(1, 0))
+            player.update_speed(Vector(1, 0))
         if gui.is_pressed(ti.GUI.UP):
-            player.update_speed(Vector2D(0, 1))
+            player.update_speed(Vector(0, 1))
         if gui.is_pressed(ti.GUI.DOWN):
-            player.update_speed(Vector2D(0, -1))
-        return player
+            player.update_speed(Vector(0, -1))
+
+        player.update_position()
 
     for i in range(1000000000):
-        player = update_self(player)
-        player.update_position()
-        paint(player.position.x(), player.position.y(), i * 0.03)
+        print(player.position.x, player.position.y)
+
+        update_self(player)
+
+        paint_player(player.position.x, player.position.y, i * 0.03)
         gui.set_image(pixels)
+
+        paint_edges()
+        gui.set_image(pixels)
+
         gui.show()
