@@ -65,9 +65,9 @@ def main():
     @ti.kernel
     def paint_edges():
         for i, j in pixels:
-            if min(i, board_size - i) < edge_size or min(
-                    j, board_size - j) < edge_size:
-                pixels[i, j] = 0
+            close = min(min(i, board_size - i), min(j, board_size - j))
+            if close <= edge_size:
+                pixels[i, j] = close / 10
 
     def update_self(player):
         gui.get_event()
