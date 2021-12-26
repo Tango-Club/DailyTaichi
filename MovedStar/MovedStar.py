@@ -1,4 +1,4 @@
-from MovedStar.Entitys import BaseEntity, Player
+from Utils.Entitys import BaseEntity, Player
 from shapely.geometry import Point as Vector
 from shapely.geometry import Polygon
 
